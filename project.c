@@ -2,6 +2,7 @@
 
 #define FLUSH while (getchar() != '\n') // replaces fflush on linux
 
+int makeCalculations (char *finput, char *foutput);
 
 int main (int argc, char const *argv[]) {
 
@@ -28,6 +29,39 @@ int main (int argc, char const *argv[]) {
         }
 
         FLUSH;
+    }
+
+    switch (optionChoosen) {
+        case 1:
+            makeCalculations("read.txt", NULL);
+            break;
+        case 2:
+            break;
+        case 3:
+            break;
+        case 4:
+            break;
+    };
+
+    return 0;
+}
+
+
+int makeCalculations (char *finput, char *foutput) {
+    if (finput) {
+        FILE *input;
+        char *line = NULL;
+        size_t len = 0;
+        ssize_t charactersRead;
+
+        input = fopen(finput, "r");
+
+        while ((charactersRead = getline(&line, &len, input)) != -1) {
+            printf("Прочетения ред е с дължина %zu :\n", charactersRead);
+            printf("%s", line);
+        }
+
+        fclose(input);
     }
 
     return 0;
