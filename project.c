@@ -5,6 +5,7 @@
 
 int searchThroughString (char *string, char *pattern);
 int readFromFile (const char *finput, const char *foutput);
+int readFromStdin (const char *foutput);
 void writeResults (const char *fileout, int ifCount, int elseCount, int charsCount);
 
 int main (int argc, char const *argv[]) {
@@ -52,14 +53,57 @@ int main (int argc, char const *argv[]) {
             }
             break;
         case 3:
+            readFromStdin(NULL);
             break;
         case 4:
+            if (argc >= 2) {
+                readFromStdin(argv[1]);
+            } else {
+                printf("Не сте въвели файл за писане\n");
+                return 0;
+            }
             break;
     };
 
     return 0;
 }
 
+int readFromStdin (const char *foutput) {
+    // input read vars
+    char *line = NULL;
+    size_t len = 0;
+    ssize_t charactersRead;
+
+    // comment vars
+    const char pattern[3] = "/*";
+    char *token;
+    int inComment = 0;
+
+    // result vars
+    int ifCount = 0;
+    int elseCount = 0;
+    int charsCount = 0;
+
+    while ((charactersRead = getline(&line, &len, stdin)) != -1) {
+        charsCount += charactersRead;
+
+        token = strtok(line, pattern);
+        if (token != NULL) {
+            while( token != NULL ) {
+                if (!inComment) {
+                    ifCount += searchThroughString(token, "if");
+                    elseCount += searchThroughString(token, "else");
+                }
+                token = strtok(NULL, pattern);
+                if (token != NULL) inComment = !inComment ;
+            }
+        }
+    }
+
+    writeResults(foutput, ifCount, elseCount, charsCount);
+
+    return 0;
+}
 
 int readFromFile (const char *finput, const char *foutput) {
     if (!finput) {
