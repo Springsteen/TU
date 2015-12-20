@@ -6,7 +6,7 @@
 int searchThroughString (char *string, char *pattern);
 int readFromFile (const char *finput, const char *foutput);
 int readFromStdin (const char *foutput);
-void writeResults (const char *fileout, int ifCount, int elseCount, int charsCount);
+void writeResults (const char *fileout, int ifCount, int elseCount, int linesCount);
 
 int main (int argc, char const *argv[]) {
 
@@ -38,7 +38,13 @@ int main (int argc, char const *argv[]) {
     switch (optionChoosen) {
         case 1:
             if (argc >= 3) {
-                readFromFile(argv[1], argv[2]);
+                int fileLength = strlen(argv[1]);
+                if ( (argv[1][fileLength - 2] == '.') && ( (argv[1][fileLength - 1] == 'c') || (argv[1][fileLength - 1] == 'C') ) ) {
+                    readFromFile(argv[1], argv[2]);
+                } else {
+                    printf("Въведете файл с разишернието на езика C\n");
+                    return 0;
+                }
             } else {
                 printf("Не сте въвели файлове за четене и писане\n");
                 return 0;
@@ -46,7 +52,13 @@ int main (int argc, char const *argv[]) {
             break;
         case 2:
             if (argc >= 2) {
-                readFromFile(argv[1], NULL);
+                int fileLength = strlen(argv[1]);
+                if ( (argv[1][fileLength - 2] == '.') && ( (argv[1][fileLength - 1] == 'c') || (argv[1][fileLength - 1] == 'C') ) ) {
+                    readFromFile(argv[1], NULL);
+                } else {
+                    printf("Въведете файл с разишернието на езика C\n");
+                    return 0;
+                }
             } else {
                 printf("Не сте въвели файл за четене\n");
                 return 0;
@@ -82,14 +94,22 @@ int readFromStdin (const char *foutput) {
     // result vars
     int ifCount = 0;
     int elseCount = 0;
-    int charsCount = 0;
+    int linesCount = 0;
 
     while ((charactersRead = getline(&line, &len, stdin)) != -1) {
-        charsCount += charactersRead;
+        linesCount += 1;
 
         token = strtok(line, pattern);
         if (token != NULL) {
             while( token != NULL ) {
+                if (strcmp(token, line) && searchThroughString(line, "/*")) {
+                    inComment = 1;
+                    break;
+                } else if (strcmp(token, line) && searchThroughString(line, "*/")) {
+                    inComment = 0;
+                    break;
+                }
+
                 if (!inComment) {
                     ifCount += searchThroughString(token, "if");
                     elseCount += searchThroughString(token, "else");
@@ -100,7 +120,7 @@ int readFromStdin (const char *foutput) {
         }
     }
 
-    writeResults(foutput, ifCount, elseCount, charsCount);
+    writeResults(foutput, ifCount, elseCount, linesCount - 1);
 
     return 0;
 }
@@ -126,16 +146,26 @@ int readFromFile (const char *finput, const char *foutput) {
     // result vars
     int ifCount = 0;
     int elseCount = 0;
-    int charsCount = 0;
+    int linesCount = 0;
 
     input = fopen(finput, "r");
 
     while ((charactersRead = getline(&line, &len, input)) != -1) {
-        charsCount += charactersRead;
+        linesCount += 1;
 
         token = strtok(line, pattern);
         if (token != NULL) {
+                printf("inComment: %d Token: %s\n", inComment, token);
+                printf("Equal: %d\n", strcmp(token, line));
             while( token != NULL ) {
+                if (strcmp(token, line) && searchThroughString(line, "/*")) {
+                    inComment = 1;
+                    break;
+                } else if (strcmp(token, line) && searchThroughString(line, "*/")) {
+                    inComment = 0;
+                    break;
+                }
+
                 if (!inComment) {
                     ifCount += searchThroughString(token, "if");
                     elseCount += searchThroughString(token, "else");
@@ -148,25 +178,25 @@ int readFromFile (const char *finput, const char *foutput) {
 
     fclose(input);
 
-    writeResults(foutput, ifCount, elseCount, charsCount);
+    writeResults(foutput, ifCount, elseCount, linesCount);
 
     return 0;
 }
 
-void writeResults (const char *fileout, int ifCount, int elseCount, int charsCount) {
+void writeResults (const char *fileout, int ifCount, int elseCount, int linesCount) {
     if (fileout) {
         FILE *fp;
         fp = fopen(fileout, "w");
 
-        fprintf(fp, "Брой символи %d\n", charsCount);
-        fprintf(fp, "Брой if-ове %d\n", ifCount);
-        fprintf(fp, "Брой else-ове %d\n", elseCount);
+        fprintf(fp, "Брой редове %d\n", linesCount);
+        fprintf(fp, "Брой if-ове %d\n", ifCount - elseCount);
+        fprintf(fp, "Брой if/else-ове %d\n", elseCount);
 
         fclose(fp);
     } else {
-        printf("Брой символи %d\n", charsCount);
-        printf("Брой if-ове %d\n", ifCount);
-        printf("Брой else-ове %d\n", elseCount);
+        printf("Брой редове %d\n", linesCount);
+        printf("Брой if-ове %d\n", ifCount - elseCount);
+        printf("Брой if/else-ове %d\n", elseCount);
     }
 }
 
