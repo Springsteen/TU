@@ -32,12 +32,6 @@ int showWords = 0;
     print the word counts
 */
 
-int fromFiles = 0;
-/*
-    --files0-from=F
-    read input from the files specified by NUL-terminated  names  in
-    file F; If F is - then read names from standard input
-*/
 
 void parseArguments (int argc, char const *argv[]);
 int countBytes (char* filename);
