@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 int showBytes = 0;
 /*
@@ -44,6 +45,9 @@ int countChars (char* filename);
 int countLines (char* filename);
 int countMaxLineLength (char* filename);
 int countWords (char * filename);
+
+/* helper functions */
+int fileExists(const char* filename);
 
 
 int main (int argc, char const *argv[]) {
@@ -127,4 +131,9 @@ int countMaxLineLength (char* filename) {
 
 int countWords (char * filename) {
     return 0;
+}
+
+
+int fileExists (const char* filename) {
+    return (access(filename, F_OK) != -1);
 }
