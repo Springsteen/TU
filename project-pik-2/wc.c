@@ -46,16 +46,29 @@ int countWords (char * filename);
 /* helper functions */
 int fileExists(const char* filename);
 
+// char* buildStandardRepresentation(char* filename);
 
 int main (int argc, char const *argv[]) {
 
     parseArguments(argc, argv);
 
-    // printf("Bytes: %d\n", countBytes("wc.c"));
-    // printf("Lines: %d\n", countLines("wc.c"));
-    // printf("MaxLineLength: %d\n", countMaxLineLength("wc.c"));
+    int totalLines = 0;
+    int totalWords = 0;
+    int totalBytes = 0;
+    // int totalChars = 0;
 
-    for (int i=0; i<filesCount;++i) printf("%s\n", files[i]);
+    for (int i=0; i<filesCount;++i) {
+        int lines = countLines(files[i]);
+        int words = countWords(files[i]);
+        int bytes = countBytes(files[i]);
+
+        totalLines += lines;
+        totalWords += words;
+        totalBytes += bytes;
+
+        printf("%d %d %d %s\n", lines, words, bytes, files[i]);
+    }
+    printf("%d %d %d %s\n", totalLines, totalWords, totalBytes, "total");
 
     return 0;
 }
