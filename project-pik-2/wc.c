@@ -59,11 +59,21 @@ int main (int argc, char const *argv[]) {
 void parseArguments (int argc, char const *argv[]) {
     // start from second argument, first is program name
     for (int i=1; i<argc; ++i) {
-        if (!strcmp(argv[i], "-c") || !strcmp(argv[i], "--bytes")) showBytes = 1;
-        if (!strcmp(argv[i], "-m") || !strcmp(argv[i], "--chars")) showChars = 1;
-        if (!strcmp(argv[i], "-l") || !strcmp(argv[i], "--lines")) showLines = 1;
-        if (!strcmp(argv[i], "-L") || !strcmp(argv[i], "--max-line-length")) showMaxLineLength = 1;
-        if (!strcmp(argv[i], "-w") || !strcmp(argv[i], "--words")) showWords = 1;
+        if (!strcmp(argv[i], "-c") || !strcmp(argv[i], "--bytes")) {
+            showBytes = 1;
+        } else if (!strcmp(argv[i], "-m") || !strcmp(argv[i], "--chars")) {
+            showChars = 1;
+        } else if (!strcmp(argv[i], "-l") || !strcmp(argv[i], "--lines")) {
+            showLines = 1;
+        } else if (!strcmp(argv[i], "-L") || !strcmp(argv[i], "--max-line-length")) {
+            showMaxLineLength = 1;
+        } else if (!strcmp(argv[i], "-w") || !strcmp(argv[i], "--words")) {
+            showWords = 1;
+        } else if (fileExists(argv[i])) {
+        } else {
+            printf("wc: unrecognized option '%s'\n", argv[i]);
+            exit(1);
+        }
     }
 }
 
