@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -32,6 +33,8 @@ int showWords = 0;
     print the word counts
 */
 
+char** files;
+int filesCount = 0;
 
 void parseArguments (int argc, char const *argv[]);
 int countBytes (char* filename);
@@ -52,6 +55,8 @@ int main (int argc, char const *argv[]) {
     // printf("Lines: %d\n", countLines("wc.c"));
     // printf("MaxLineLength: %d\n", countMaxLineLength("wc.c"));
 
+    for (int i=0; i<filesCount;++i) printf("%s\n", files[i]);
+
     return 0;
 }
 
@@ -70,6 +75,9 @@ void parseArguments (int argc, char const *argv[]) {
         } else if (!strcmp(argv[i], "-w") || !strcmp(argv[i], "--words")) {
             showWords = 1;
         } else if (fileExists(argv[i])) {
+            files = realloc(files, ++filesCount * sizeof(char*));
+            files[filesCount-1] = (char*) malloc(strlen(argv[i]) * sizeof(char));
+            strcpy(files[filesCount-1], argv[i]);
         } else {
             printf("wc: unrecognized option '%s'\n", argv[i]);
             exit(1);
