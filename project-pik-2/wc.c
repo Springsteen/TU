@@ -48,9 +48,9 @@ int main (int argc, char const *argv[]) {
 
     parseArguments(argc, argv);
 
-    printf("Bytes: %d\n", countBytes("wc.c"));
-    printf("Lines: %d\n", countLines("wc.c"));
-    printf("MaxLineLength: %d\n", countMaxLineLength("wc.c"));
+    // printf("Bytes: %d\n", countBytes("wc.c"));
+    // printf("Lines: %d\n", countLines("wc.c"));
+    // printf("MaxLineLength: %d\n", countMaxLineLength("wc.c"));
 
     return 0;
 }
@@ -59,20 +59,12 @@ int main (int argc, char const *argv[]) {
 void parseArguments (int argc, char const *argv[]) {
     // start from second argument, first is program name
     for (int i=1; i<argc; ++i) {
-        // printf("%s\n", argv[i]);
-
         if (!strcmp(argv[i], "-c") || !strcmp(argv[i], "--bytes")) showBytes = 1;
         if (!strcmp(argv[i], "-m") || !strcmp(argv[i], "--chars")) showChars = 1;
         if (!strcmp(argv[i], "-l") || !strcmp(argv[i], "--lines")) showLines = 1;
         if (!strcmp(argv[i], "-L") || !strcmp(argv[i], "--max-line-length")) showMaxLineLength = 1;
         if (!strcmp(argv[i], "-w") || !strcmp(argv[i], "--words")) showWords = 1;
     }
-
-    // printf("showBytes: %d\n", showBytes);
-    // printf("showChars: %d\n", showChars);
-    // printf("showLines: %d\n", showLines);
-    // printf("showMaxLineLength: %d\n", showMaxLineLength);
-    // printf("showWords: %d\n", showWords);
 }
 
 
