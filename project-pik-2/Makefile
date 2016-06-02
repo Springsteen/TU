@@ -1,2 +1,2 @@
 compile:
-	gcc wc.c -o wc -Wall
+	gcc wc.c -o wc -static

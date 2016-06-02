@@ -3,6 +3,17 @@
 #include <string.h>
 #include <unistd.h>
 
+#define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"
+#define BYTE_TO_BINARY(byte)  \
+  (byte & 0x80 ? '1' : '0'), \
+  (byte & 0x40 ? '1' : '0'), \
+  (byte & 0x20 ? '1' : '0'), \
+  (byte & 0x10 ? '1' : '0'), \
+  (byte & 0x08 ? '1' : '0'), \
+  (byte & 0x04 ? '1' : '0'), \
+  (byte & 0x02 ? '1' : '0'), \
+  (byte & 0x01 ? '1' : '0')
+
 int showBytes = 0;
 /*
     -c, --bytes
@@ -45,6 +56,8 @@ int countWords (char * filename);
 
 /* helper functions */
 int fileExists(const char* filename);
+void printOutput(int lines, int words, int bytes, int maxLine, char* file);
+void printBinaryOutput(int lines, int words, int bytes, int maxLine, char* file);
 
 // char* buildStandardRepresentation(char* filename);
 
@@ -56,23 +69,59 @@ int main (int argc, char const *argv[]) {
     int totalWords = 0;
     int totalBytes = 0;
     // int totalChars = 0;
+    int maxLine = 0;
 
     for (int i=0; i<filesCount;++i) {
         int lines = countLines(files[i]);
         int words = countWords(files[i]);
         int bytes = countBytes(files[i]);
+        int currMaxLine = countMaxLineLength(files[i]);
 
         totalLines += lines;
         totalWords += words;
         totalBytes += bytes;
+        if (currMaxLine > maxLine) maxLine = currMaxLine;
 
-        printf("%d %d %d %s\n", lines, words, bytes, files[i]);
+        printOutput(lines, words, bytes, currMaxLine, files[i]);
+        printBinaryOutput(totalLines, totalWords, totalBytes, maxLine, "total");
     }
-    printf("%d %d %d %s\n", totalLines, totalWords, totalBytes, "total");
+    printOutput(totalLines, totalWords, totalBytes, maxLine, "total");
+    printBinaryOutput(totalLines, totalWords, totalBytes, maxLine, "total");
 
     return 0;
 }
 
+void printOutput(int lines, int words, int bytes, int maxLine, char* file) {
+    if (!showBytes &&!showChars && !showLines && !showMaxLineLength && !showWords) {
+        printf("%d %d %d %s\n", lines, words, bytes, file);
+    } else {
+        if (showBytes) printf("%d ", bytes);
+        if (showChars) printf("%d ", bytes);
+        if (showLines) printf("%d ", lines);
+        if (showMaxLineLength) printf("%d ", maxLine);
+        if (showWords) printf("%d ", words);
+        printf("%s\n", file);
+    }
+}
+
+void printBinaryOutput(int lines, int words, int bytes, int maxLine, char* file) {
+    if (!showBytes &&!showChars && !showLines && !showMaxLineLength && !showWords) {
+        printf(BYTE_TO_BINARY_PATTERN" ", BYTE_TO_BINARY(lines));
+        printf(BYTE_TO_BINARY_PATTERN" ", BYTE_TO_BINARY(words));
+        printf(BYTE_TO_BINARY_PATTERN" ", BYTE_TO_BINARY(bytes));
+
+    } else {
+        if (showBytes) printf(BYTE_TO_BINARY_PATTERN" ", BYTE_TO_BINARY(bytes));
+        if (showChars) printf(BYTE_TO_BINARY_PATTERN" ", BYTE_TO_BINARY(bytes));
+        if (showLines) printf(BYTE_TO_BINARY_PATTERN" ", BYTE_TO_BINARY(lines));
+        if (showMaxLineLength) printf(BYTE_TO_BINARY_PATTERN" ", BYTE_TO_BINARY(maxLine));
+        if (showWords) printf(BYTE_TO_BINARY_PATTERN" ", BYTE_TO_BINARY(words));
+    }
+    for (int i = 0; i < strlen(file); ++i) {
+        printf(BYTE_TO_BINARY_PATTERN" ", BYTE_TO_BINARY(file[i]));
+    }
+    printf("\n");
+}
 
 void parseArguments (int argc, char const *argv[]) {
     // start from second argument, first is program name
@@ -147,7 +196,13 @@ int countMaxLineLength (char* filename) {
 
 
 int countWords (char * filename) {
-    return 0;
+    FILE * fp = fopen(filename, "rb");
+    int count = 1;
+    char c;
+    while ((c = fgetc(fp)) != EOF) {
+        if (c == ' ') count++;
+    }
+    return count;
 }
 
 
